@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: multi-example-subject-headless
+spec:
+  clusterIP: None # This lines makes the service headless
+  selector:
+    pass.subject: multi-example-subject-headless
+  ports:
+    - name: input-pool
+      port: 8080
+      targetPort: 8080

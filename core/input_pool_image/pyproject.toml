@@ -1,0 +1,10 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "input_pool"
+version = "1.0.0"
+
+[project.scripts]
+input-pool = "input_pool.app:main"

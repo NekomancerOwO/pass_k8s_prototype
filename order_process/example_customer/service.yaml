@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: example-customer
+spec:
+  selector:
+    pass.subject: example-customer
+  ports:
+    - name: input-pool
+      port: 8080
+      targetPort: 8080

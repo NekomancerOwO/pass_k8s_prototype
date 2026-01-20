@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-customer-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /messages
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /customer
+            pathType: Prefix
+            backend:
+              service:
+                name: example-customer
+                port:
+                  number: 8080
