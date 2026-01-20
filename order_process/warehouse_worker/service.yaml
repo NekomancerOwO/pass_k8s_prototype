@@ -3,7 +3,6 @@ kind: Service
 metadata:
   name: warehouse-worker
 spec:
-  clusterIP: None
   selector:
     pass.subject: warehouse-worker
   ports:

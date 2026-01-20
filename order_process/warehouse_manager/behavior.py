@@ -70,7 +70,7 @@ def send_items_to_warehouse_workers(order):
             f"[{SUBJECT_NAME}] Sending item '{item}' for order {order_id} to warehouse worker",
             flush=True,
         )
-        headless_send_message(
+        send_message(
             sender=SUBJECT_NAME,
             receiver="warehouse-worker",
             msg_type="JOB",
