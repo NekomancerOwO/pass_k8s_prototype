@@ -1,3 +1,5 @@
+import signal
+import sys
 import time
 
 from flask import Flask, jsonify, request
@@ -15,9 +17,17 @@ input_pool = InputPool(
 )
 
 
+def handle_sigterm(signum, frame):
+    print("[input-pool] SIGTERM received, shutting down", flush=True)
+    sys.exit(0)
+
+
+signal.signal(signal.SIGTERM, handle_sigterm)
+
+
 @internal_app.route("/messages/receive", methods=["POST"])
 def receive():
-    msg = input_pool.receive_blocking(request.json, timeout=25.0)
+    msg = input_pool.receive_blocking(request.json, timeout=9)
     if msg:
         return jsonify(msg.__dict__), 200
     return jsonify({"error": "timeout"}), 408

@@ -2,6 +2,7 @@ import os
 import time
 
 from runtime.config import SUBJECT_NAME
+from runtime.lifecycle import termination_requested
 from runtime.messaging import (
     fetch_message,
     headless_send_message,
@@ -19,6 +20,10 @@ def example_receive_state():
     Implementation of a standard receive state. Continues asking for responses from the input pool until a specific message is present.
     """
 
+    if termination_requested():
+        print(f"[{SUBJECT_NAME}] PASS end state reached, terminating", flush=True)
+        return None
+
     msg = fetch_message(
         {
             "sender": "example-subject",
@@ -27,7 +32,7 @@ def example_receive_state():
     )
     if msg:
         if msg["msg_type"] == "example_message":
-            print(f"[{subject_name}] Message from {msg['sender']}", flush=True)
+            print(f"[{SUBJECT_NAME}] Message from {msg['sender']}", flush=True)
             return example_function_state(msg)
 
     return example_receive_state  # Retry if request times out
@@ -40,7 +45,7 @@ def example_function_state(msg):
     if msg["payload"].get("value") == "error_message":
         raise RuntimeError("Forced crash for testing restart policy")
 
-    print(f"[{subject_name}] Working on payload: {msg['payload']}", flush=True)
+    print(f"[{SUBJECT_NAME}] Working on payload: {msg['payload']}", flush=True)
     time.sleep(5)
     return example_end_state  # Transition to the next state
 
@@ -50,7 +55,7 @@ def example_end_state():
     Implementation of an end state. Kubernetes will keep resurrecting containers if they finish executing. The restart policy can be modified to change this,
     however doing so would affect the desired self healing and resilience mechanism. In this example the container is just put to sleep indefinitely.
     """
-    print(f"[{subject_name}] Reached END state. Stopping subject behavior.", flush=True)
+    print(f"[{SUBJECT_NAME}] Reached END state. Stopping subject behavior.", flush=True)
     while True:
         time.sleep(3600)
 

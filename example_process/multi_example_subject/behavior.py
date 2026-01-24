@@ -1,7 +1,9 @@
 import os
 import time
+from tkinter.constants import NONE
 
 from runtime.config import SUBJECT_NAME
+from runtime.lifecycle import termination_requested
 from runtime.messaging import (
     fetch_message,
     headless_send_message,
@@ -51,8 +53,7 @@ def example_end_state():
     however doing so would affect the desired self healing and resilience mechanism. In this example the container is just put to sleep indefinitely.
     """
     print(f"[{SUBJECT_NAME}] Reached END state. Stopping subject behavior.", flush=True)
-    while True:
-        time.sleep(3600)
+    return None
 
 
 # --- Execution Start ---

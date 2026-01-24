@@ -3,6 +3,7 @@ import random
 import time
 
 from runtime.config import SUBJECT_NAME
+from runtime.lifecycle import termination_requested
 from runtime.messaging import (
     fetch_message,
     send_message,
@@ -29,6 +30,11 @@ def example_receive_state():
     """
     Receives signals from external subjects.
     """
+
+    if termination_requested():
+        print(f"[{SUBJECT_NAME}] PASS end state reached, terminating", flush=True)
+        return None
+
     msg = fetch_message(
         {
             "sender": "external-subject",

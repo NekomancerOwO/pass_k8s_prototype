@@ -5,6 +5,7 @@ import time
 import requests
 
 from runtime.config import SUBJECT_NAME
+from runtime.lifecycle import termination_requested
 
 # --- Communication with Services ---
 
@@ -15,7 +16,7 @@ def fetch_message(criteria):
     """
     try:
         response = requests.post(
-            "http://localhost:8081/messages/receive", json=criteria, timeout=30
+            "http://localhost:8081/messages/receive", json=criteria, timeout=10
         )
 
         if response.status_code == 200:
@@ -38,9 +39,10 @@ def send_message(
     receiver: str,
     msg_type: str,
     payload,
+    retry_delay=5,
 ):
     """
-    Helper function for communication with other subjects
+    Helper function for sending messages to other subjects. Will retry if message exchange fails.
     """
 
     message = {
@@ -52,23 +54,29 @@ def send_message(
 
     url = f"http://{receiver}:8080/messages"
 
-    try:
-        response = requests.post(url, json=message, timeout=5)
+    while not termination_requested():
+        try:
+            response = requests.post(url, json=message, timeout=5)
 
-        if response.status_code == 200:
-            print(f"[{sender}] Sent {msg_type} to {receiver}", flush=True)
-            return True
-        else:
+            if response.status_code == 200:
+                print(f"[{sender}] Sent {msg_type} to {receiver}", flush=True)
+                return True
+
             print(
-                f"[{sender}] Send failed with status {response.status_code}", flush=True
+                f"[{sender}] Send failed with status {response.status_code}",
+                flush=True,
             )
-            return False
 
-    except Exception as e:
-        print(
-            f"[{sender}] ERROR: Could not reach {receiver}. (Details: {e})", flush=True
-        )
-        return False
+        except requests.exceptions.RequestException as e:
+            print(
+                f"[{sender}] ERROR: Could not reach {receiver}. ({e})",
+                flush=True,
+            )
+        time.sleep(retry_delay)
+        print(f"[{sender}] Retrying...", flush=True)
+
+    print(f"[{sender}] Send aborted due to termination request", flush=True)
+    return False
 
 
 # --- Communication with headless Services ---

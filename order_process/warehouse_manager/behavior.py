@@ -2,6 +2,7 @@ import os
 import time
 
 from runtime.config import SUBJECT_NAME
+from runtime.lifecycle import termination_requested
 from runtime.messaging import fetch_message, headless_send_message, send_message
 from runtime.state_engine import run
 
@@ -13,6 +14,10 @@ def wait_for_warehouse_order():
     The order intake waits for an ORDER message from a customer. The payload is a list of strings representing the ordered Items.
     Also includes simulation for a system crash.
     """
+
+    if termination_requested():
+        print(f"[{SUBJECT_NAME}] PASS end state reached, terminating", flush=True)
+        return None
 
     msg = fetch_message(
         {

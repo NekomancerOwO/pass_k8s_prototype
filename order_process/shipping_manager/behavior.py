@@ -3,6 +3,7 @@ import time
 from collections import defaultdict
 
 from runtime.config import SUBJECT_NAME
+from runtime.lifecycle import termination_requested
 from runtime.messaging import fetch_message, send_message
 from runtime.state_engine import run
 
@@ -20,6 +21,10 @@ def shipping_receive_state():
     """
     The shipping manager waits for order jobs or item deliveries
     """
+    if termination_requested():
+        print(f"[{SUBJECT_NAME}] PASS end state reached, terminating", flush=True)
+        return None
+
     msg = fetch_message(
         {
             "msg_type": ["SHIPPING_ORDER", "ITEM"],

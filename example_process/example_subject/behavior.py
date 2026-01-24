@@ -2,6 +2,7 @@ import os
 import time
 
 from runtime.config import SUBJECT_NAME
+from runtime.lifecycle import termination_requested
 from runtime.messaging import (
     fetch_message,
     headless_send_message,
@@ -18,6 +19,10 @@ def example_receive_state():
     """
     Implementation of a branching receive state. Continues asking for responses from the input pool until a specific message is present. Transitions into different states depending on the message received.
     """
+
+    if termination_requested():
+        print(f"[{SUBJECT_NAME}] PASS end state reached, terminating", flush=True)
+        return None
 
     msg = fetch_message(
         {

@@ -2,6 +2,7 @@ import os
 import time
 
 from runtime.config import INSTANCE_IP, SUBJECT_NAME
+from runtime.lifecycle import termination_requested
 from runtime.messaging import fetch_message, send_message
 from runtime.state_engine import run
 
@@ -14,6 +15,11 @@ def receive_job_from_manager():
     """
     The warehouse worker waits for a job from the manager.
     """
+
+    if termination_requested():
+        print(f"[{SUBJECT_NAME}] PASS end state reached, terminating", flush=True)
+        return None
+
     msg = fetch_message(
         {
             "sender": ["warehouse-manager"],
@@ -91,7 +97,7 @@ def get_item_from_shelf(msg):
     print(
         f"[{SUBJECT_NAME}] Fetching item '{item}' from isle {location}...", flush=True
     )
-    time.sleep(3)  # simulate time to fetch
+    time.sleep(5)  # simulate time to fetch
 
     return send_item_to_shipping(msg)
 

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: warehouse-worker
 spec:
-  replicas: 10
+  replicas: 1
   selector:
     matchLabels:
       pass.subject: warehouse-worker
