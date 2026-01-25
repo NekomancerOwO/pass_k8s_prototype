@@ -54,7 +54,7 @@ def send_message(
 
     url = f"http://{receiver}:8080/messages"
 
-    while not termination_requested():
+    while True:
         try:
             response = requests.post(url, json=message, timeout=5)
 
@@ -73,10 +73,10 @@ def send_message(
                 flush=True,
             )
         time.sleep(retry_delay)
+        if termination_requested():
+            print(f"[{sender}] Send aborted due to termination request", flush=True)
+            return False
         print(f"[{sender}] Retrying...", flush=True)
-
-    print(f"[{sender}] Send aborted due to termination request", flush=True)
-    return False
 
 
 # --- Communication with headless Services ---

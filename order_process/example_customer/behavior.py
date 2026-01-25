@@ -37,17 +37,22 @@ def example_receive_state():
 
     msg = fetch_message(
         {
-            "sender": "external-subject",
-            "msg_type": ["START"],
+            "msg_type": ["TEST", "CRASH"],
         }
     )
     if msg:
-        if msg["msg_type"] == "START":
+        if msg["msg_type"] == "TEST":
             print(
                 f"[{SUBJECT_NAME}] Received TEST signal: sending batch orders...",
                 flush=True,
             )
             return send_batch_orders_state()
+        if msg["msg_type"] == "CRASH":
+            print(
+                f"[{SUBJECT_NAME}] Received CRASH signal: sending poisoned batch orders...",
+                flush=True,
+            )
+            return send_batch_orders_poisoned_state()
 
     return example_receive_state  # Retry if request times out
 
@@ -70,10 +75,46 @@ def send_batch_orders_state():
 
         print(f"[{SUBJECT_NAME}] Sending order {order_num}: {order_items}", flush=True)
         send_message(**order_payload)
-        time.sleep(1)  # slight delay between orders
+        time.sleep(1)
 
     print(f"[{SUBJECT_NAME}] Finished sending batch orders.", flush=True)
-    return example_receive_state  # Back to receive state
+    return example_receive_state
+
+
+def send_batch_orders_poisoned_state():
+    """
+    Simulates 3 customer orders: the first and last are normal,
+    the middle order causes the intake to crash.
+    """
+    num_orders = 3
+    for order_num in range(1, num_orders + 1):
+        all_items = [item for sublist in WAREHOUSE_MAP.values() for item in sublist]
+
+        if order_num == 2:
+            order_payload = {
+                "sender": SUBJECT_NAME,
+                "receiver": "order-intake",
+                "msg_type": "CRASH",
+                "payload": [],
+            }
+            print(f"[{SUBJECT_NAME}] Sending CRASH order {order_num}", flush=True)
+        else:
+            order_items = random.sample(all_items, 1)  # Only 1 item
+            order_payload = {
+                "sender": SUBJECT_NAME,
+                "receiver": "order-intake",
+                "msg_type": "ORDER",
+                "payload": order_items,
+            }
+            print(
+                f"[{SUBJECT_NAME}] Sending order {order_num}: {order_items}", flush=True
+            )
+
+        send_message(**order_payload)
+        time.sleep(1)
+
+    print(f"[{SUBJECT_NAME}] Finished sending poisoned batch orders.", flush=True)
+    return example_receive_state
 
 
 # --- Execution Start ---

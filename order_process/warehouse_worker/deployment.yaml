@@ -32,6 +32,11 @@ spec:
           image: input_pool:latest
           imagePullPolicy: Never
           command: ["input-pool"]
+
+          env:
+            - name: SENDER_LIMIT
+              value: "1"
+
           ports:
             - containerPort: 8081
             - containerPort: 8080

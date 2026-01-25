@@ -32,7 +32,7 @@ def wait_for_order():
 
     msg = fetch_message(
         {
-            "msg_type": ["ORDER"],
+            "msg_type": ["ORDER", "CRASH"],
         }
     )
     if msg:

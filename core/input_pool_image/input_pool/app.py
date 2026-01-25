@@ -17,14 +17,6 @@ input_pool = InputPool(
 )
 
 
-def handle_sigterm(signum, frame):
-    print("[input-pool] SIGTERM received, shutting down", flush=True)
-    sys.exit(0)
-
-
-signal.signal(signal.SIGTERM, handle_sigterm)
-
-
 @internal_app.route("/messages/receive", methods=["POST"])
 def receive():
     msg = input_pool.receive_blocking(request.json, timeout=9)
