@@ -1,17 +1,17 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: example-subject-ingress
+  name: service-desk-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /messages
 spec:
   rules:
     - http:
         paths:
-          - path: /example-subject
+          - path: /service-desk
             pathType: Prefix
             backend:
               service:
-                name: example-subject
+                name: service-desk
                 port:
                   number: 8080

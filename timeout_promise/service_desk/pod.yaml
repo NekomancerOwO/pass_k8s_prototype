@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: service-desk
+  labels:
+    pass.subject: service-desk
+spec:
+  restartPolicy: Always
+
+  containers:
+    - name: subject-behavior
+      image: service_desk:latest
+      imagePullPolicy: Never
+      command: ["python", "/app/behavior.py"]
+
+      env:
+        - name: SUBJECT_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: PROCESS_INSTANCE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+
+    - name: input-pool
+      image: input_pool:latest
+      imagePullPolicy: Never
+      command: ["input-pool"]
+
+      env:
+        - name: MAX_SIZE
+          value: "10"
+        - name: SENDER_LIMIT
+          value: "10"
+        - name: TYPE_LIMIT
+          value: "5"
+        - name: OVERFLOW_STRATEGY
+          value: "BLOCK"
+
+      ports:
+        - containerPort: 8081
+        - containerPort: 8080

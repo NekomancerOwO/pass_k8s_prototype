@@ -2,7 +2,7 @@
 import time
 
 
-def run(start_state, delay=1):
+def run(start_state, delay=2):
     time.sleep(delay)  # Wait for input pool to initialize
     current_state = start_state
 
