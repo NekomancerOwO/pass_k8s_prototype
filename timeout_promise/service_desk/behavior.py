@@ -43,7 +43,7 @@ def send_promise():
     """
     Service Desk sends promise to respond within 24 hours.
     """
-    promise = create_promise_payload(PromiseType.TIMEOUT.value, time.time() + 5)
+    promise = create_promise_payload(PromiseType.TIMEOUT.value, time.time() + 20)
 
     print(f"[{SUBJECT_NAME}] Sending promise ...", flush=True)
     send_message(
@@ -52,16 +52,16 @@ def send_promise():
         msg_type="PROMISE",
         payload=promise,
     )
-    return receive_service_request  # Loop back to receive state
+    return process_service_request
 
 
-def example_function_state():
+def process_service_request():
     """
     Implementation of a function state.
     """
     print(f"[{SUBJECT_NAME}] Doing work...", flush=True)
     time.sleep(10)
-    return send_response  # Transition to the next state
+    return send_response
 
 
 def send_response():

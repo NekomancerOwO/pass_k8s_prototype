@@ -43,6 +43,7 @@ def receive_inventory_promise():
             return False  # Promise Broken
 
         inventory_promise = Promise(condition=promise_condition)
+        print(f"[{SUBJECT_NAME}] Promise Received ...", flush=True)
         return request_item_count(inventory_promise)
 
     return receive_inventory_promise  # Retry if request times out
@@ -111,3 +112,4 @@ def end_state():
 # --- Execution Start ---
 if __name__ == "__main__":
     run(receive_inventory_promise)
+

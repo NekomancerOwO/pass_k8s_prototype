@@ -27,10 +27,13 @@ class Promise:
         result = self.condition(*args, **kwargs)
 
         if result is True:
+            print("[Assessment] Promise State: KEPT", flush=True)
             self.state = PromiseState.KEPT
         elif result is False:
+            print("[Assessment] Promise State: BROKEN", flush=True)
             self.state = PromiseState.BROKEN
         else:
+            print("[Assessment] Promise State: UNKNOWN", flush=True)
             self.state = PromiseState.UNKNOWN
 
         return self.state

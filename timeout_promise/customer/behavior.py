@@ -53,6 +53,7 @@ def receive_promise():
             return None  # Promise Unknown
 
         timeout_promise = Promise(condition=promise_condition)
+        print(f"[{SUBJECT_NAME}] Promise Received ...", flush=True)
         return receive_response(timeout_promise)
 
     return receive_promise  # Retry if request times out
@@ -80,7 +81,9 @@ def receive_response(timeout_promise):
         )
         return send_service_request  # Loop back to beginning if promise times out
     if promise_state == PromiseState.UNKNOWN:
-        return receive_response  # Keep waiting for response if promise is not broken
+        return receive_response(
+            timeout_promise
+        )  # Keep waiting for response if promise is not broken
 
 
 def end_state():
